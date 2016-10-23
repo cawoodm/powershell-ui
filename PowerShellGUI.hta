@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>PowerUp</title>
+<hta:application applicationname="PowerUp" version="1.0" icon="icon.ico"/>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+<script language="vbscript">
+Dim oShell: Set oShell = CreateObject("WScript.Shell")
+Dim fso: Set fso = CreateObject("Scripting.FileSystemObject")
+Dim ROOT: ROOT = oShell.CurrentDirectory
+Sub Init()
+	Elem("command").focus()
+	If 1 = 1 Then
+		Elem("command").Value = "ls -filter *.* | select Name,Length,CreationTime | sort length"
+		Elem("optHtml").checked = True
+		Elem("optNoSecurity").Checked = True
+	End If
+	ExecuteHelp()
+End Sub
+Function ExecutePowerShell()
+	
+	Dim sCommand: sCommand = Elem("command").Value
+	
+	If Elem("optHtml").checked And Right(sCommand, 14) <> "ConvertTo-Html" Then
+		If InStr(sCommand, " | ConvertTo-")>0 Then sCommand = Before(sCommand, " | ConvertTo-")
+		sCommand = sCommand & " | ConvertTo-Html"
+	ElseIf Elem("optCsv").checked And Right(sCommand, 13) <> "ConvertTo-Csv" Then
+		If InStr(sCommand, " | ConvertTo-")>0 Then sCommand = Before(sCommand, " | ConvertTo-")
+		sCommand = sCommand & " | ConvertTo-Csv"
+	End If
+	Elem("command").Value = sCommand
+
+	Dim sResultData: sResultData = ExecutePS(sCommand)
+	
+	If Elem("optHtml").checked Then
+		outHtml sResultData
+	Else
+		out sResultData
+	End If
+End Function
+Sub ExecuteHelp()
+	Dim CmdLet: CmdLet = Elem("inpHelp").Value
+	Dim res: res = ExecutePS("Help " + cmdLet)
+	out sResultData
+End Sub
+Function ExecutePS(sCommand)
+	
+	If sCommand = "" Then Exit Function
+	
+	SaveToFile "command.ps1", sCommand
+	
+	dp sCommand
+	If Not Elem("optNoSecurity").Checked Then
+		sCmd = "POWERSHELL -File """ & ROOT & "\command.ps1"""
+	Else
+		sCmd = "POWERSHELL -Command ""$enccmd=[Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Content -Path 'command.ps1')));POWERSHELL -EncodedCommand $enccmd"""
+	End If
+	Dim ExecMode: ExecMode = "Run"
+	If fso.FileExists("output.txt") Then fso.DeleteFile("output.txt")
+	If ExecMode = "Run" Then sCmd = sCmd & " > output.txt"
+
+	' Error redirection
+	sCmd = sCmd & " 2> error.txt"
+
+	' Have to do this or errors are not piped to 2> error.txt
+	sCmd = "%COMSPEC% /C " & sCmd
+	dp sCmd
+	On Error Resume Next
+	If ExecMode = "Exec" Then
+		Dim oExec: Set oExec = oShell.Exec(sCmd)
+	Else
+		Dim iResult: iResult = oShell.Run(sCmd, 0, true) ' 0=Hidden, 1=Show; true=wait for execution
+	End If
+	If Err<>0 Then
+		MsgBox Err.Description, vbCritical, "System Error"
+		Exit Function
+	End If
+	On Error Goto 0
+	
+	Dim sErrorData: sErrorData = LoadFromFile("error.txt")
+	If sErrorData<>"" Then
+		MsgBox sErrorData, vbExclamation, "Command Error" 'vbCritical
+		Exit Function
+	End If
+
+	If ExecMode = "Run" Then
+		ExecutePS = LoadFromFile("output.txt")
+	Else
+		ExecutePS = oExec.StdOut.ReadAll
+	End If
+
+End Function
+Function Elem(Id)
+	Set Elem = document.getElementById(id)
+End Function
+Sub doKeyUp()
+	Dim key: key = window.event.keyCode
+	Dim el: Set el = window.event.srcElement
+	If el.id = "command" Then
+		If key = 13 Then ExecutePowerShell()
+	ElseIf el.id = "inpHelp" Then
+		If key = 13 Then ExecuteHelp()
+	End If
+End Sub
+Sub out(d)
+	Dim el: Set el = Elem("results")
+	el.innerText = d
+	el.scrollTop = el.scrollHeight
+End Sub
+Sub outHtml(d)
+	Dim el: Set el = Elem("results")
+	el.innerHTML = d
+	el.scrollTop = 0
+	'SaveToFile "output.html", d
+	'oShell.Exec("CMD /C output.html")
+End Sub
+Sub dp(d)
+	Dim el: Set el = Elem("debug")
+	el.innerHTML = el.innerHTML & d & "<br>"
+	el.scrollTop = el.scrollHeight
+End Sub
+Function Before(strData, strStart)
+   Dim t1: t1 = InStr(strData, strStart)
+   If t1>0 Then Before = Left(strData, t1-1)
+End Function
+
+Function AfterI(strData, strStart)
+   Dim t1: t1 = InStr(LCase(strData), LCase(strStart))
+   If t1>0 Then AfterI = Mid(strData, t1+Len(strStart))
+End Function
+Function LoadFromFile(filename)
+	If Not IsObject(fso) Then Set fso = CreateObject("Scripting.FileSystemObject")
+	If Not fso.FileExists(filename) Then Exit Function
+	Dim f: Set f = fso.OpenTextFile(filename)
+	If f.AtEndOfStream Then
+		f.Close
+		Set f = Nothing
+		Exit Function
+	End If
+	intAsc1Chr = Asc(f.Read(1))
+	If Not f.AtEndOfStream Then intAsc2Chr = Asc(f.Read(1))
+	f.Close
+	If intAsc1Chr = 255 And intAsc2Chr = 254 Then
+		Set f = fso.OpenTextFile(filename, 1, 0, True)
+	Else
+		Set f = fso.OpenTextFile(filename)
+	End If
+	LoadFromFile = f.ReadAll()
+	f.Close
+End Function
+Sub SaveToFile(filename, data)
+	If Not IsObject(fso) Then Set fso = CreateObject("Scripting.FileSystemObject")
+	Dim f: set f = fso.CreateTextFile(filename)
+	f.write data
+	f.close
+	Set f = Nothing
+End Sub
+</script>
+<style>
+body {
+	font-family: consolas;
+	font-size: small;
+	
+	background: #666;
+	height: 100%
+}
+#results {
+	color:white;
+	background:#008;
+	height:300px;
+	overflow-y:scroll
+}
+#results table tr th {
+	text-align: left;
+	cursor: hand
+}
+#results table, #results table th, #results table td {
+    border: 1px solid #eee;
+}
+input.button {
+	color: #fff;
+	background: #333
+}
+div#tabs {
+	height: 100%
+}
+</style>
+</head>
+	
+<body onload="Init()">
+
+  <div style="margin-top:5px"><br><br>
+	<input type="text" style="border:1px solid black; width:90%" id="command" value="" onkeyup="doKeyUp()"/>
+	<input type="button" class="button" value="Run" onclick="ExecutePowerShell()" /><br>
+	<input type=checkbox id=optNoSecurity><label for=optNoSecurity title="Bypass Powershell's Execution Policy">Bypass Security
+	<input name=optFormatOut type=radio value="html" id=optHtml><label for=optHtml>HTML</label><input type=radio name=optFormatOut value="csv" id=optCsv><label for=optCsv> CSV</label>
+	<pre id="results" style=""></pre>
+	</div>
+
+  <div id="tabs-2">
+    <pre id="debug" style="font-family:consolas;font-size:xx-small;background:#DDD;color:#333;overflow-y:scroll; height:50px"></pre>
+  </div>
+  <div id="tabs-3">
+		<input type="text" style="border:1px solid black; width:90%" id="inpHelp" value="Get-ChildItem" onkeyup="doKeyUp()"/>
+  </div>
+
+
+</body>
+</html>

@@ -36,15 +36,15 @@ function ExecutePowerShell() {
 }
 function ExecuteHelp() {
 	var cmdLet = $("#inpHelp").val()
-	//var res = ExecutePS("Get-Command " + cmdLet + " | ConvertTo-Json")
-	var res = ExecutePS("Help " + cmdLet)
+	var res = ExecutePS("Get-Command " + cmdLet + " | ConvertTo-Json")
+	//var res = ExecutePS("Help " + cmdLet)
 	$('#outHelp').text(res) // PS Output is text by default
-	var cmd = jQuery.parseJSON("{\"Verb\":1}")
-	//jsShowObject(cmd)
+	var cmd = JSON.parse(res);
+	jsShowObject(cmd)
 }
 function jsShowObject(obj) {
-	//alert(JSON.stringify(obj))
-	alert(obj)
+	alert(JSON.stringify(obj))
+	//alert(obj)
 }
 function ExecutePS(sCommand) {
 	
