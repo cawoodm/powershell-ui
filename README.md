@@ -9,7 +9,6 @@ their favorite scripts.
 Ultimately I'd like it to be a graphical IDE for connecting scriptlets together into workflows.
 
 ## Pre-requisites
-```
 We have a .hta version which can be run on Windows without any extras.
 The HTML5 application requires nodeJS, NPM and Electron.
 ```
