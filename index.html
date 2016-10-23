@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+		<title>PowerShell UI</title>
+		<link rel="stylesheet" href="./css/normalize.css">
+		<link rel="stylesheet" href="./js/jquery-ui/jquery-ui.css" />
+		<link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+	<div id="tabs" class="expand">
+		<ul>
+			<li><a href="#tabs-1">Commands</a></li>
+			<li><a href="#tabs-2">Debug</a></li>
+			<li><a href="#tabs-3">Help</a></li>
+		</ul>
+		<div id="tabs-1" class="expand">
+			<input type="text" style="border:1px solid black; width:90%" id="command" value="" onkeyup="doKeyUp()"/>
+			<input type="button" class="button" value="Run" onclick="ExecutePowerShell()" /><br>
+			<input type=checkbox id=optNoSecurity><label for=optNoSecurity title="Bypass Powershell's Execution Policy">Bypass Security
+			<select id=optFormatOut><option>Format</option><option value="html">HTML<option value="csv">CSV</select>
+			<pre id="results" class="results expand"></pre>
+		</div>
+		<div id="tabs-2" class="expand">
+			<pre id="debug" class="expand"></pre>
+		</div>
+		<div id="tabs-3" class="expand">
+			<input type="text" style="border:1px solid black; width:90%" id="inpHelp" value="about" onkeyup="doKeyUp()"/>
+			<pre id="outHelp" class="results expand">Enter a CmdLet or Topic above to get Help	
+			</pre>
+		</div>
+	</div>
+</body>
+<script src="app.js"></script>
+<script language="javascript" src="./js/jquery-ui/jquery-ui.js"></script>
+</html>

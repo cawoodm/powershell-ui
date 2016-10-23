@@ -1,0 +1,21 @@
+{
+  "name": "powershell-ui",
+  "version": "0.0.1",
+  "description": "A PowerShell GUI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/cawoodm/powerup",
+  "keywords": [
+    "PowerShell"
+  ],
+  "author": "Marc Cawood",
+  "license": "MIT",
+  "devDependencies": {
+    "electron-debug": "^1.0.0"
+  },
+  "dependencies": {
+    "jquery": "^3.1.1"
+  }
+}
