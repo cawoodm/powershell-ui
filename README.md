@@ -8,23 +8,36 @@ their favorite scripts.
 
 Ultimately I'd like it to be a graphical IDE for connecting scriptlets together into workflows.
 
-## Pre-requisites
-We have a .hta version which can be run on Windows without any extras.
-The HTML5 application requires nodeJS, NPM and Electron.
+## Platforms
+
+* Electron version in `powershell-ui-electron`
+* HTA version in `powershell-ui-hta`
+* NW.js version in `powershell-ui-nw`
+
+The .hta version is a single file which can be run on Windows without any extras.
+
+The HTML5 applications requires nodeJS, NPM and either Electron or NW.js.
+
+### Electron
 ```
 npm install -g electron
-```
-
-## Installation
-To install and run the HTML version:
-```
 git clone https://github.com/cawoodm/powershell-ui.git
 cd powershell-ui
+cd powershell-ui-electron
 npm install
 npm start
 
 ```
 
+### NW.js
+```
+npm install -g nwjs
+git clone https://github.com/cawoodm/powershell-ui.git
+cd powershell-ui
+cd powershell-ui-nw
+npm install
+npm start
 
+```
 
 #### License [MIT]
