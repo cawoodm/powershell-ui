@@ -1,0 +1,25 @@
+{
+  "name": "powershell-ui",
+  "version": "0.0.1",
+  "description": "A PowerShell GUI",
+  "author": "Marc Cawood",
+  "license": "MIT",
+  "main": "index.html",
+  "scripts": {
+    "start": "nw ."
+  },
+  "repository": "https://github.com/cawoodm/powershell-ui",
+  "keywords": [
+    "PowerShell"
+  ],
+  "window": {
+    "title": "PowerShell GUI",
+    "icon": "icon.ico",
+    "toolbar": true,
+    "frame": true,
+    "width": 800,
+    "height": 500,
+    "position": "center",
+		"fullscreen": false
+  }
+}

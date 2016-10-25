@@ -1,18 +1,17 @@
-html, body {
+body, * {
 	font-family: lucida console,consolas,courier new;
-	font-size: small;
-	height: 100%
+	font-size: small
 }
-.expand {height:100%}
+html, body, .expand {height:100%}
 .results {
+	font-family: lucida console,consolas,courier new;
 	color:white;
 	background:#008;
 	overflow-y:scroll
 }
 #debug {
-	font-family:consolas;
-	font-size:xx-small;
-	background:#DDD;
+	font-family: lucida console,consolas,courier new;
+	background:#EEE;
 	color:#333;
 	overflow-y:scroll
 }

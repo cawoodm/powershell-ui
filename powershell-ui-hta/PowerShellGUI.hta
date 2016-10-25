@@ -73,6 +73,7 @@ Function ExecutePS(sCommand)
 		Dim iResult: iResult = oShell.Run(sCmd, 0, true) ' 0=Hidden, 1=Show; true=wait for execution
 	End If
 	If Err<>0 Then
+		CleanFiles()
 		MsgBox Err.Description, vbCritical, "System Error"
 		Exit Function
 	End If
@@ -80,6 +81,7 @@ Function ExecutePS(sCommand)
 	
 	Dim sErrorData: sErrorData = LoadFromFile("error.txt")
 	If sErrorData<>"" Then
+		CleanFiles()
 		MsgBox sErrorData, vbExclamation, "Command Error" 'vbCritical
 		Exit Function
 	End If
@@ -89,7 +91,14 @@ Function ExecutePS(sCommand)
 	Else
 		ExecutePS = oExec.StdOut.ReadAll
 	End If
+	
+	CleanFiles()
 
+End Function
+Function CleanFiles()
+	If fso.FileExists("output.txt") Then fso.DeleteFile("output.txt")
+	If fso.FileExists("error.txt") Then fso.DeleteFile("error.txt")
+	If fso.FileExists("command.ps1") Then fso.DeleteFile("command.ps1")
 End Function
 Function Elem(Id)
 	Set Elem = document.getElementById(id)
