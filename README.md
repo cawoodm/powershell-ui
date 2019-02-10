@@ -12,7 +12,7 @@ Ultimately I'd like it to be a graphical IDE for connecting scriptlets together 
 
 * Electron version in `powershell-ui-electron`
 * HTA version in `powershell-ui-hta`
-* NW.js version in `powershell-ui-nw`
+* NWJS version in `powershell-ui-nw`
 
 The .hta version is a single file which can be run on Windows without any extras.
 
@@ -29,9 +29,9 @@ npm start
 
 ```
 
-### NW.js
+### NWJS
 ```
-npm install -g nwjs
+npm install -g nw
 git clone https://github.com/cawoodm/powershell-ui.git
 cd powershell-ui
 cd powershell-ui-nw
