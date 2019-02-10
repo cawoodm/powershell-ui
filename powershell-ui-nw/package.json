@@ -18,7 +18,7 @@
     "toolbar": true,
     "frame": true,
     "width": 800,
-    "height": 500,
+    "height": 1000,
     "position": "center",
 		"fullscreen": false
   }

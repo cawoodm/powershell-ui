@@ -1,7 +1,7 @@
 const pjson = require('./package.json'),
 			fs  = require('fs'),
 			sh = require('child_process');
-			
+//console.log();
 const SEP = (process.platform === "win32"?"\\":"/");
 const TMP = process.env.TMPDIR
          || process.env.TMP
@@ -24,7 +24,7 @@ $(function() {
 		$("#optNoSecurity").checked = true
 	}
 	//ExecuteHelp()
-	window.resizeTo(800,450)
+	//window.resizeTo(800,450)
 });
 
 function ExecutePowerShell() {
@@ -37,6 +37,9 @@ function ExecutePowerShell() {
 	} else if (jQuery("#optFormatOut").val()=="csv" && sCommand.substring(sCommand.length-13) != "ConvertTo-Csv") {
 		if (sCommand.indexOf(" | ConvertTo-")>=0) sCommand = Before(sCommand, " | ConvertTo-")
 		sCommand = sCommand + " | ConvertTo-Csv"
+	} else if (jQuery("#optFormatOut").val()=="json" && sCommand.substring(sCommand.length-13) != "ConvertTo-JSon") {
+		if (sCommand.indexOf(" | ConvertTo-")>=0) sCommand = Before(sCommand, " | ConvertTo-")
+		sCommand = sCommand + " | ConvertTo-Json"
 	}
 	$("#command").val(sCommand)
 
@@ -44,6 +47,8 @@ function ExecutePowerShell() {
 	
 	if (jQuery("#optFormatOut").val()=="html")
 		outHtml(sResultData)
+	else if (jQuery("#optFormatOut").val()=="json")
+		outJson(sResultData)
 	else
 		out(sResultData)
 }
@@ -116,6 +121,14 @@ function out(d) {
 	var el = $("#results")
 	el.text(d)
 	el.scrollTop = el.scrollHeight
+}
+function outJson(d) {
+	try {
+		let obj = JSON.parse(d);
+		alert(obj[1].Name)
+	} catch {
+		alert("Error parsing JSON result:\n" + d)
+	}
 }
 function outHtml(d) {
 	var el = $("#results")

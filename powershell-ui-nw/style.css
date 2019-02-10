@@ -2,7 +2,8 @@ body, * {
 	font-family: lucida console,consolas,courier new;
 	font-size: small
 }
-html, body, .expand {height:100%}
+html, body {height:100%}
+.expand {height:95%}
 .results {
 	font-family: lucida console,consolas,courier new;
 	color:white;
