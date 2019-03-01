@@ -3,14 +3,13 @@ const pjson = require('./package.json'),
 			sh = require('child_process');
 //console.log();
 const SEP = (process.platform === "win32"?"\\":"/");
-const TMP = process.env.TMPDIR
-         || process.env.TMP
-         || process.env.TEMP
-         || (process.platform === "win32"?"c:\\windows\\temp":"/tmp")
-				 + SEP;
-
+const TMP = (process.env.TMPDIR
+        	|| process.env.TMP
+        	|| process.env.TEMP
+        	|| (process.platform === "win32"?"c:\\windows\\temp":"/tmp")
+	 	) + SEP;
 console.log("PowerShell UI v"+pjson.version+" starting...");
-
+//alert(process.versions['nw-flavor'])
 //DEBUG: Watch for changes and reload automatically
 fs.watch('./', {recursive:true}, function() {if (location) location.reload();});
 
@@ -44,7 +43,6 @@ function ExecutePowerShell() {
 	$("#command").val(sCommand)
 
 	var sResultData = ExecutePS(sCommand)
-	
 	if (jQuery("#optFormatOut").val()=="html")
 		outHtml(sResultData)
 	else if (jQuery("#optFormatOut").val()=="json")
@@ -54,11 +52,12 @@ function ExecutePowerShell() {
 }
 function ExecuteHelp() {
 	var cmdLet = $("#inpHelp").val()
-	var res = ExecutePS("Get-Command " + cmdLet + " | ConvertTo-Json")
+	let res = ExecutePS(`help "${cmdLet}"`);
+	//console.log(`Get-Content "${TMP}\help.txt"`)
+	//let res = ExecutePS(`Get-Content "${TMP}\\help.txt"`);
 	//var res = ExecutePS("Help " + cmdLet)
 	$('#outHelp').text(res) // PS Output is text by default
-	var cmd = JSON.parse(res);
-	jsShowObject(cmd)
+	//var cmd = JSON.parse(res);jsShowObject(cmd)
 }
 function jsShowObject(obj) {
 	alert(JSON.stringify(obj))
@@ -98,6 +97,7 @@ function ExecutePS(sCommand) {
 		return LoadFromFile(TMP+"output.txt")
 
 	} catch (err) {
+		console.log("err")
 		alert("System Error:\n"+err.message)
 		DeleteFile(TMP+"output.txt");
 		DeleteFile(TMP+"error.txt");
@@ -124,8 +124,9 @@ function out(d) {
 }
 function outJson(d) {
 	try {
+		out(d)
 		let obj = JSON.parse(d);
-		alert(obj[1].Name)
+		alert(obj.length + " entries returned!")
 	} catch {
 		alert("Error parsing JSON result:\n" + d)
 	}
@@ -137,13 +138,14 @@ function outHtml(d) {
 	//SaveToFile "output.html", d
 	//oShell.Exec("CMD /C output.html")
 }
-function dp(d) {
+function dp(...params) {
+	//console.log(params);return;
 	var el = $("#debug")
-	el.html(el.html() + d + "<br>")
+	el.html(el.html() + params + "<br>")
 	el.scrollTop = el.scrollHeight
 }
 function Before(d, s) {
-	return d.substr(0, addy.indexOf(s));
+	return d.substr(0, d.indexOf(s));
 }
 
 function LoadFromFile(filename) {
